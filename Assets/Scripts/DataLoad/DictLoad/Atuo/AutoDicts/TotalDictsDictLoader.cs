@@ -8,6 +8,8 @@ namespace DataLoad
         public int id;
         public string tableName;
         public int bPreloading;
+
+        public int xx = 4;
     }
 
     public class TotalDictsDictLoader : DictLoader

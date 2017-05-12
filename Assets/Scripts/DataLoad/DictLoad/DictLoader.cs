@@ -71,7 +71,7 @@ namespace DataLoad
 
             if(bError)
             {
-                LoggerHelper.Error(string.Format("{0} LoadDictFile Error!", filePath));
+                LoggerHelper.Error(string.Format("{0} LoadDictFile Error!", dirPath));
             }
         }
 

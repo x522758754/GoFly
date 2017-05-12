@@ -59,7 +59,7 @@ namespace DataLoad
             return arrayStr;
         }
 
-        public static List<int> ToIntArray(string str)
+        public static List<int> ToArrayInt(string str)
         {
             if (!string.IsNullOrEmpty(str))
             {
@@ -76,7 +76,7 @@ namespace DataLoad
             return null;
         }
 
-        public static List<float> ToFloatArray(string str)
+        public static List<float> ToArrayFloat(string str)
         {
             if (!string.IsNullOrEmpty(str))
             {
@@ -93,7 +93,7 @@ namespace DataLoad
             return null;
         }
 
-        public static List<string> ToStringArray(string str)
+        public static List<string> ToArrayString(string str)
         {
             if (!string.IsNullOrEmpty(str))
             {
