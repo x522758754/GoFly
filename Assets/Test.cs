@@ -8,21 +8,14 @@ public class Test : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
     {
-        RunCoroutine.Instance.Run(ss());
+        IPoolableObjectFactory factory = GameObjectPoolableObjectFactory.Instance;
+
+        IObjectPool pool = GameObjectPoolFactory.Instance.CreatePool(factory, 100);
+
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		
 	}
-
-    IEnumerator ss()
-    {
-        print(1);
-        yield return 0;
-        print(2);
-
-        yield return 0;
-        print(3);
-    }
 }
