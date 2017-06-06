@@ -1,0 +1,2 @@
+ui:
+	在Unity中不建议使用jpg，建议使用png，tga格式

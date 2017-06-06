@@ -3,7 +3,7 @@
 namespace Util
 {
     public class Singleton<T> where T : class, new()
-    {
+    {   
         private static readonly object localLock = new object();
         protected static T m_instance = null;
         public static T Instance

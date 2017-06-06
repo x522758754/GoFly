@@ -18,7 +18,7 @@ namespace UI
             return null;
         }
 
-        public static GameObject AddChild(GameObject child, GameObject parent)
+        public static GameObject AddChildReset(GameObject child, GameObject parent)
         {
             if(null == child || null == parent)
             {
@@ -33,6 +33,14 @@ namespace UI
                 child.transform.localScale = Vector3.one;
 
                 return child;
+            }
+        }
+
+        public static void AddChild(GameObject child, GameObject parent)
+        {
+            if(null != child && null != parent)
+            {
+                child.transform.parent = parent.transform;
             }
         }
     }

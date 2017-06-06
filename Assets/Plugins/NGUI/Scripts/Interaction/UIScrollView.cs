@@ -1060,4 +1060,142 @@ public class UIScrollView : MonoBehaviour
 		}
 	}
 #endif
+    
+    /*
+     * 自定义Scrollview 方法
+     * */
+
+    private bool mMoveSmoothToLast;
+    private Vector2 mToLastOffset = Vector2.zero;
+
+    /// <summary>
+    /// 显示最后一个
+    /// </summary>
+    /// <param name="moveSmooth"></param>
+    public void ShowLastOne(bool moveSmooth)
+    {
+        if (moveSmooth)
+        {
+            mCalculatedBounds = false;
+            Bounds bound = bounds;
+            Vector2 region = new Vector2(mPanel.finalClipRegion.z, mPanel.finalClipRegion.w);
+            Vector2 realRegion = (bound.max - bound.min);
+            if (movement == Movement.Horizontal)
+            {
+                mMoveSmoothToLast = realRegion.x >= region.x;
+            }
+            else if (movement == Movement.Vertical)
+            {
+                mMoveSmoothToLast = realRegion.y > region.y;
+            }
+            else if (movement == Movement.Unrestricted)
+            {
+                mMoveSmoothToLast = realRegion.magnitude > region.magnitude;
+            }
+            if (mMoveSmoothToLast)
+            {
+                mToLastOffset = mPanel.clipOffset - (Vector2)bound.min;
+            }
+        }
+        else
+        {
+            ResetPosition();
+            Vector2 pv = NGUIMath.GetPivotOffset(contentPivot);
+            float x = (horizontalScrollBar != null) ? horizontalScrollBar.value : pv.x;
+            float y = (verticalScrollBar != null) ? verticalScrollBar.value : 1f - pv.y;
+            if (movement == Movement.Vertical)
+            {
+                y = shouldMove ? 1f : 0f;
+                if (verticalScrollBar != null)
+                {
+                    verticalScrollBar.value = y;
+                    OnScrollBar();
+                }
+                else
+                {
+                    SetDragAmount(x, y, false);
+                    SetDragAmount(x, y, true);
+                }
+
+            }
+            else if (movement == Movement.Horizontal)
+            {
+                x = shouldMove ? 1f : 0f;
+                if (horizontalScrollBar != null)
+                {
+                    horizontalScrollBar.value = x;
+                    OnScrollBar();
+                }
+                else
+                {
+                    SetDragAmount(x, y, false);
+                    SetDragAmount(x, y, true);
+                }
+            }
+            else if (movement == Movement.Unrestricted)
+            {
+                y = shouldMove ? 1f : 0f;
+                x = shouldMove ? 1f : 0f;
+                if (verticalScrollBar != null && horizontalScrollBar != null)
+                {
+                    verticalScrollBar.value = y;
+                    horizontalScrollBar.value = x;
+                    OnScrollBar();
+                }
+                else
+                {
+                    SetDragAmount(x, y, false);
+                    SetDragAmount(x, y, true);
+                }
+            }
+        }
+
+
+    }
+
+    /// <summary>
+    /// 显示指定的一个
+    /// </summary>
+    /// <param name="goSpecified"></param>
+    public void ShowSpecialOne(GameObject goSpecified)
+    {
+        if (goSpecified.activeInHierarchy)
+        {
+            mCalculatedBounds = false;
+            Bounds bound = bounds;
+            Vector3 position = goSpecified.transform.localPosition;
+            Vector3 offset = mPanel.clipOffset - (Vector2)position;
+            Vector2 region = new Vector2(mPanel.finalClipRegion.z, mPanel.finalClipRegion.w);
+            Vector2 realMin = (Vector2)bound.min + region / 2;
+            Vector2 realMax = (Vector2)bound.max - region / 2;
+            Vector2 maxOffset = mPanel.clipOffset - realMin;
+            Vector2 minOffset = mPanel.clipOffset - realMax;
+            if (movement == Movement.Horizontal)
+            {
+                offset.y = 0;
+                offset.x = Mathf.Clamp(offset.x, minOffset.x, maxOffset.x);
+            }
+            else if (movement == Movement.Vertical)
+            {
+                offset.x = 0;
+                offset.y = Mathf.Clamp(offset.y, minOffset.y, maxOffset.y);
+            }
+            MoveRelative(offset);
+        }
+    }
+
+    /// <summary>
+    /// 显示指定的一个子物体
+    /// </summary>
+    /// <param name="childIndex"></param>
+    public void ShowSpecialOne(int childIndex)
+    {
+        int count = transform.childCount;
+        if (childIndex >= 0 && childIndex < count)
+        {
+            Transform child = transform.GetChild(childIndex);
+            ShowSpecialOne(child.gameObject);
+        }
+    }
+
 }
