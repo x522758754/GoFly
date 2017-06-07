@@ -43,8 +43,9 @@ namespace DataLoad
         /// </summary>
         /// <param name="filePath"></param>
         public void LoadDictFile(string dirPath)
-        { 
-            DictFileReader dfr = new DictFileReader(string.Format("{0}/{1}", dirPath, GetFileName()));
+        {
+            string fileName = GetFileName();
+            DictFileReader dfr = new DictFileReader(string.Format("{0}/{1}", dirPath, fileName));
 
             bool bError = false;
             m_listCache = new List<DictModel>();

@@ -11,7 +11,7 @@ public class CommonHelper
     /// <summary>
     /// 当前机器的UTC时间(毫秒)
     /// </summary>
-    public static long _UtcNowMS
+    public static long _UtcNowMs
     {
         get
         {
@@ -70,5 +70,24 @@ public class CommonHelper
         TimeSpan ts = TimeSpan.FromSeconds(utcSecondLarge - utcSecondSmall);
 
         return ts;
+    }
+
+    public static string DataTimeToString(DateTime dt)
+    {
+        /*
+            dt.ToString();//2005-11-5 13:21:25
+            dt.ToLongDateString().ToString();//2005年11月5日
+            yyyy 包括纪元的四位数的年份。
+            MM 月份数字。一位数的月份有一个前导零。
+            dd 月中的某一天。一位数的日期有一个前导零。 
+            HH 24 小时制的小时。一位数的小时数有前导零。
+            mm 分钟。一位数的分钟数有一个前导零。 
+            ss 秒。一位数的秒数有一个前导零。 
+        */
+        string str = string.Empty;
+
+        str = dt.ToString("yyyy-MM-dd HH:mm:ss");
+
+        return str;
     }
 }

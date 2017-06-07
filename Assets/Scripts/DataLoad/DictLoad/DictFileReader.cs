@@ -8,6 +8,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
+using Util;
 
 namespace DataLoad
 {
@@ -23,17 +24,14 @@ namespace DataLoad
 
         public DictFileReader(string filePath)
         {
-            //bundle或Resource.Load
-            //先用Resource.Load，后续需要有一个资源加载类
-            TextAsset text = Resources.Load(filePath) as TextAsset;
+            TextAsset text = ResourceManager.Instance.LoadResourceBlock(filePath) as TextAsset;
             if (null != text)
             {
                 m_memoryStream = new MemoryStream(text.bytes);
                 m_reader = new StreamReader(m_memoryStream);
             }
             else
-            {
-                
+            {   
             }
         }
 

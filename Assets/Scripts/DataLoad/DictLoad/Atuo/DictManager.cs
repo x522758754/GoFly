@@ -1,19 +1,15 @@
 ﻿/************************************************* 
 Copyright: 
-Author: 
+Author: auto-generate
 Date:
-Description:数据表管理类 part1:手写
+Description:数据表管理类 part2
 **************************************************/
-
-using System;
-using System.Collections.Generic;
-using Util;
 
 namespace DataLoad
 {
     public partial class DictManager
     {
-        #region 备注所有表名
+        #region 所有表名
         
         /// <summary>
         /// 所有表名
@@ -30,6 +26,9 @@ namespace DataLoad
 
         #region 加载数据
 
+        /// <summary>
+        /// 加载数据
+        /// </summary>
         private void Loads()
         {
             _TotalDicts.LoadDictFile(_DirPath);
@@ -39,6 +38,9 @@ namespace DataLoad
 
         #region 卸载数据 
 
+        /// <summary>
+        /// 卸载数据
+        /// </summary>
         private void Unloads()
         {
             _TotalDicts.Release();
