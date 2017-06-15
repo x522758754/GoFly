@@ -53,7 +53,7 @@ namespace UI
         /// <param name="option"></param>
         public void OpenPage(string pageName, string option)
         {
-            LoggerHelper.Info(string.Format("Open page: {0}, option: {1}", pageName, option));
+            LoggerHelper.Log(string.Format("Open page: {0}, option: {1}", pageName, option));
 
             if (null != m_currentPage && string.Equals(m_currentPage.name, pageName))
             {

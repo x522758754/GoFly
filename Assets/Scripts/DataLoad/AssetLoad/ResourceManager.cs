@@ -12,89 +12,6 @@ using Util;
 namespace DataLoad
 {
     /// <summary>
-    /// 资源计数器
-    /// </summary>
-    public class AssetCounter
-    {
-        /// <summary>
-        /// 资源引用数
-        /// </summary>
-        private int m_iReferenceCount;
-        public int _iReferenceCount { get { return m_iReferenceCount; } }
-
-        /// <summary>
-        /// 资源
-        /// </summary>
-        private Object m_objAsset;
-        public Object _objAsset { get { return m_objAsset; } }
-
-        public AssetCounter(Object obj, int count = 1)
-        {
-            m_iReferenceCount = count;
-            m_objAsset = obj;
-        }
-
-        public void IncreaseReference()
-        {
-            ++m_iReferenceCount;
-        }
-
-        public void DecreaseReference()
-        {
-            --m_iReferenceCount;
-
-//             if (0 >= m_iReferenceCount)
-//             {
-//                 if(null != m_objAsset)
-//                 {
-//                     Resources.UnloadAsset(m_objAsset);
-//                     m_objAsset = null;
-//                 }
-//             }
-        }
-
-    }
-
-    /// <summary>
-    /// 资源移除器
-    /// </summary>
-    public class AssetRemover
-    {
-        /// <summary>
-        /// 移除时间间隔(单位:秒)
-        /// </summary>
-        public static readonly float _assetRemoveCacheTime = 10f;
-        public static readonly float _assetRemoveCacheMinTime = 2f;
-
-
-        /// <summary>
-        /// 上一次移除的时间点(单位:秒)
-        /// </summary>
-        public static float _lastTimeToRemoveAsset = 0f;
-        /// <summary>
-        /// 移除时间
-        /// </summary>
-        private float m_fRemoveTime;
-        public float _fRemoveTime { get { return m_fRemoveTime; } }
-
-        /// <summary>
-        /// 资源
-        /// </summary>
-        private Object m_objAsset;
-        public Object _objAsset { get { return m_objAsset; } }
-
-        private string m_assetPath;
-        public string _assetPath { get { return m_assetPath; } }
-
-        public AssetRemover(string assetPath, Object assetObj, float timeRemove)
-        {
-            m_assetPath = assetPath;
-            m_objAsset = assetObj;
-            m_fRemoveTime = timeRemove;
-        }
-    }
-
-    /// <summary>
     /// 资源管理
     /// </summary>
     public class ResourceManager : Singleton<ResourceManager>
@@ -196,7 +113,7 @@ namespace DataLoad
             if(m_assetUsedList.ContainsKey(assetPath))
             {
                 AssetCounter ac = m_assetUsedList[assetPath];
-                ac.DecreaseReference();
+                ac.SubtractReferenceCount();
 
                 if (0 == ac._iReferenceCount) //将其从在用资源列表中移除
                 {
@@ -250,13 +167,14 @@ namespace DataLoad
         /// </summary>
         private void UpdateAssetToRemove()
         {
-            if(AssetRemover._assetRemoveCacheMinTime < Time.time - AssetRemover._lastTimeToRemoveAsset)
+            //是否可以移除资源
+            if(Time.time - AssetRemover.s_lastTimeToRemoveAsset > AssetRemover.c_assetRemoveCacheMinTime)
             {
-                AssetRemover._lastTimeToRemoveAsset = Time.time;
+                AssetRemover.s_lastTimeToRemoveAsset = Time.time;
                 while (m_assetRemovingQueue.Count > 0)
                 {
                     AssetRemover ar = m_assetRemovingQueue[0];
-                    if (Time.time - ar._fRemoveTime >= AssetRemover._assetRemoveCacheTime)
+                    if (Time.time - ar._fRemoveTime >= AssetRemover.c_assetRemoveCacheTime)
                     {
                         m_assetRemovingQueue.RemoveAt(0);
                         Resources.UnloadAsset(ar._objAsset);
@@ -327,7 +245,7 @@ namespace DataLoad
         private Object LoadAssetFromRemovingQueue(string assetPath)
         {
             Object assetObj = null;
-            for(int i=0; i != m_assetRemovingQueue.Count; ++i)
+            for(int i= m_assetRemovingQueue.Count-1; i != 0; --i)
             {
                 AssetRemover ar = m_assetRemovingQueue[i];
                 if(ar._assetPath == assetPath && null != ar._objAsset)
@@ -353,7 +271,7 @@ namespace DataLoad
             if (m_assetUsedList.ContainsKey(assetPath))
             {
                 var assetCounter = m_assetUsedList[assetPath];
-                assetCounter.IncreaseReference();
+                assetCounter.AddReferenceCount();
                 assetObj = assetCounter._objAsset;
             }
 
@@ -400,6 +318,91 @@ namespace DataLoad
                 throw new MissingReferenceException(string.Format("LoadResAsync Callback Error: key {0} not exist.", assetPath));
             }
 
+        }
+    }
+
+
+    /// <summary>
+    /// 资源计数器
+    /// </summary>
+    public class AssetCounter
+    {
+        /// <summary>
+        /// 资源引用数
+        /// </summary>
+        private int m_iReferenceCount;
+        public int _iReferenceCount { get { return m_iReferenceCount; } }
+
+        /// <summary>
+        /// 资源
+        /// </summary>
+        private Object m_objAsset;
+        public Object _objAsset { get { return m_objAsset; } }
+
+        public AssetCounter(Object obj, int count = 1)
+        {
+            m_iReferenceCount = count;
+            m_objAsset = obj;
+        }
+
+        public void AddReferenceCount()
+        {
+            ++m_iReferenceCount;
+        }
+
+        public void SubtractReferenceCount()
+        {
+            --m_iReferenceCount;
+
+            //             if (0 >= m_iReferenceCount)
+            //             {
+            //                 if(null != m_objAsset)
+            //                 {
+            //                     Resources.UnloadAsset(m_objAsset);
+            //                     m_objAsset = null;
+            //                 }
+            //             }
+        }
+
+    }
+
+    /// <summary>
+    /// 资源移除器
+    /// </summary>
+    public class AssetRemover
+    {
+        /// <summary>
+        /// 资源从标记为dirty到真正移除的时间(单位:秒)
+        /// </summary>
+        public static readonly float c_assetRemoveCacheTime = 10f;
+        //资源之间移除时间间隔
+        public static readonly float c_assetRemoveCacheMinTime = 2f;
+
+
+        /// <summary>
+        /// 上一次移除的时间点(单位:秒)
+        /// </summary>
+        public static float s_lastTimeToRemoveAsset = 0f;
+        /// <summary>
+        /// 移除时间
+        /// </summary>
+        private float m_fRemoveTime;
+        public float _fRemoveTime { get { return m_fRemoveTime; } }
+
+        /// <summary>
+        /// 资源
+        /// </summary>
+        private Object m_objAsset;
+        public Object _objAsset { get { return m_objAsset; } }
+
+        private string m_assetPath;
+        public string _assetPath { get { return m_assetPath; } }
+
+        public AssetRemover(string assetPath, Object assetObj, float timeRemove)
+        {
+            m_assetPath = assetPath;
+            m_objAsset = assetObj;
+            m_fRemoveTime = timeRemove;
         }
     }
 }

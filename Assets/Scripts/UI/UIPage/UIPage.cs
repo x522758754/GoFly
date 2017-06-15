@@ -176,7 +176,7 @@ namespace UI
         /// <param name="option"></param>
         public void Reopen(string option)
         {
-            LoggerHelper.Info("Reopen");
+            LoggerHelper.Log("Reopen");
             m_strOption = option;
             ParseOptionString();
             DoOpen();
@@ -240,7 +240,7 @@ namespace UI
         /// </summary>
         public virtual void OnCoverPageClose()
         {
-            LoggerHelper.Info("Cover page remove");
+            LoggerHelper.Log("Cover page remove");
 
         }
 
@@ -249,7 +249,7 @@ namespace UI
         /// </summary>
         public virtual void OnCoverPageOpen()
         {
-            LoggerHelper.Info("Cover page open");
+            LoggerHelper.Log("Cover page open");
         }
 
         /// <summary>
@@ -265,7 +265,7 @@ namespace UI
         /// </summary>
         public virtual void OnMemoryPageDestory()
         {
-            LoggerHelper.Info("Destory from memory!");
+            LoggerHelper.Log("Destory from memory!");
         }
 
         public PageInfo GetPageInfo()

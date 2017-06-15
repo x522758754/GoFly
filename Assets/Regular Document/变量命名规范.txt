@@ -1,7 +1,0 @@
-
-UILabel lbAbb
-UISprite spAbb
-UIButton btnAbb
-string strAbb
-GameObject goAbb
-GameObject prefabAbb

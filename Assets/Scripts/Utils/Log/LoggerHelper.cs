@@ -121,7 +121,7 @@ namespace Util
         /// 信息日志。
         /// </summary>
         /// <param name="message">日志内容</param>
-        public static void Info(object message, Boolean isShowStack = SHOW_STACK)
+        public static void Log(object message, Boolean isShowStack = SHOW_STACK)
         {
             if (LogLevel.INFO == (CurrentLogLevels & LogLevel.INFO))
                 Log(string.Concat(" [INFO]: ", isShowStack ? GetStackInfo() : "", message), LogLevel.INFO);

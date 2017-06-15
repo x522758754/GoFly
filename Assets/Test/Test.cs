@@ -1,19 +1,26 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using UnityEngine;
 using LitJson;
 using Util;
 using System;
 using DataLoad;
+using UI;
+using NetWork;
+
 
 public class Test:MonoBehaviour
 {
-    JsonData m_jsonData;
-    // Use this for initialization
     void Start ()
     {
-        DictManager.Instance.Initialze("Dicts");
-        DictManager.Instance.Release();
+
+    }
+
+    void Update()
+    {
+
     }
 
 }
