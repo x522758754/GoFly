@@ -136,7 +136,6 @@ namespace NetWork
         private void print(object o)
         {
             Util.LoggerHelper.Log(o);
-
         }
     }
 }
