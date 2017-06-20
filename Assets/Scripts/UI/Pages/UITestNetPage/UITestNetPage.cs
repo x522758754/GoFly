@@ -9,7 +9,7 @@ namespace UI
         public UILabel m_lbServerContent;
         public UILabel m_lbClientContent;
 
-        private NetClient m_client = new NetClient();
+        private TcpClientWorker m_client = new TcpClientWorker();
 
         protected override void DoOpen()
         {
@@ -24,7 +24,6 @@ namespace UI
         public void OnBtnListen()
         {
             NetServer.Instance.Start();
-            
         }
 
         public void OnBtnServerSend()
@@ -33,18 +32,49 @@ namespace UI
 
         public void OnBtnConnect()
         {
-            m_client.Connent();
+            m_client.Connect("127.0.0.1", 5555);
         }
 
         public void OnBtnClientSend()
         {
-            m_client.Send(m_lbClientContent.text);
+            //m_client.Send();
         }
 
         public void ShowContent(NetModel it)
         {
             if(null != it)
                 m_lbServerContent.text = it.Message;
+        }
+
+        public void OnToggleOne()
+        {
+            CSLogin msg = new CSLogin();
+            msg.deviceKey = "asus";
+            msg.ip = "127.0.0.1";
+            Packet p = new Packet((int)PBCodeEnum.CSLogin, msg);
+
+            m_client.Send(p);
+        }
+        public void OnToggleTwo()
+        {
+            CSHeartBeat msg = new CSHeartBeat();
+            msg.clientTime = CommonHelper._UtcNowMs;
+            Packet p = new Packet((int)PBCodeEnum.CSHeartBeat, msg);
+
+            m_client.Send(p);
+        }
+        public void OnToggleThree()
+        {
+
+        }
+
+        public void OnDestroy()
+        {
+            m_client.Release();
+        }
+        public void OnDisable()
+        {
+            //m_client.Close();
         }
     }
 }

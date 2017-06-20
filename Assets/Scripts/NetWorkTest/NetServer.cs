@@ -16,15 +16,13 @@ namespace NetWork
         private Socket server;
         private Stack<NetUserToken> pools;
 
-        private Action<NetModel> m_callback;
-
         private NetServer()
         {
             server = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             server.Bind(new IPEndPoint(IPAddress.Any, port));
         }
 
-        public void Start(Action<NetModel> callback = null)
+        public void Start()
         {
             server.Listen(maxClient);
 
@@ -34,7 +32,6 @@ namespace NetWork
             for(int i=0; i < maxClient; ++i)
             {
                 NetUserToken ut = new NetUserToken();
-                ut.receiveCallback = callback;
                 pools.Push(ut);
             }
 
@@ -90,7 +87,6 @@ namespace NetWork
                 print(e.Message);
             }
         }
-
 
         private void print(object o)
         {

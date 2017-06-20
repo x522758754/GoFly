@@ -15,7 +15,7 @@ public class Test:MonoBehaviour
 {
     void Start ()
     {
-        throw new Exception(string.Format("Exception. the tcpClient do connecting error:"));
+        
     }
 
     void Update()

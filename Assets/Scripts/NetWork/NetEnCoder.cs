@@ -50,6 +50,10 @@ namespace NetWork
 
         public static Packet Decode(byte[] bytes)
         {
+            int offset = 0;
+            int len = Decode(bytes, ref offset);
+            
+
             Packet p = null;
 
             return p;
@@ -57,13 +61,22 @@ namespace NetWork
 
         public static int Decode(byte[] bytes, ref int offset)
         {
-            int value = BitConverter.ToInt32(bytes, offset);
-            offset += GetIntLength();
+            //需要判断bytes的Length
+            try
+            {
+                int value = BitConverter.ToInt32(bytes, offset);
+                offset += GetIntLength();
 
-            //注意端的大小
-            //value = IPAddress.NetworkToHostOrder(value)
+                //注意端的大小
+                //value = IPAddress.NetworkToHostOrder(value)
 
-            return value;
+                return value;
+            }
+            catch (Exception e)
+            {
+                LoggerHelper.Except(e);
+                return 0;
+            }
         }
 
         public static byte[] GetBytes(int value)

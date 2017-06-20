@@ -42,16 +42,17 @@ namespace NetWork
             byte[] data = NetEncode.Decode(ref receiveCache);
             if(null != data)
             {
-                NetModel item = NetModel.Deserialize(data);
-                print(item.Message);
-                if(null != receiveCallback)
+                int offset = 0;
+                int nCode = NetEnCoder.Decode(data, ref offset);
+                int nCount = data.Length - offset;
+                object msg = PBEnCoder.Decode(nCode, data, offset, nCount);
+
+                if(0 != nCode)
                 {
-                    receiveCallback(item);
+                    HandleMsg(nCode, msg);
                 }
 
                 ReadData();
-
-                WriteSendData(NetEncode.Encode(data));
             }
             else
             {
@@ -102,6 +103,35 @@ namespace NetWork
             {
                 isSending = true;
                 Send();
+            }
+        }
+
+        private void HandleMsg(int code, object msg)
+        {
+            switch((PBCodeEnum)code)
+            {
+                case PBCodeEnum.CSHeartBeat:
+                    {
+                        print((CSHeartBeat)msg);
+                        SCHeartBeat heart = new SCHeartBeat();
+                        heart.clientTime = CommonHelper._UtcNowMs;
+                        heart.serverTime = CommonHelper._UtcNowMs + 1;
+                        Packet p = new Packet((int)PBCodeEnum.SCHeartBeat, heart);
+                        byte[] bytes = NetEnCoder.Encode(p);
+                        WriteSendData(bytes);
+                    }
+                    break;
+                case PBCodeEnum.CSLogin:
+                    {
+                        print((CSLogin)msg);
+                        SCLogin login = new SCLogin();
+                        login.errorCode = 0;
+                        login.loginRet = 1;
+                        Packet p = new Packet((int)PBCodeEnum.SCLogin, login);
+                        byte[] bytes = NetEnCoder.Encode(p);
+                        WriteSendData(bytes);
+                    }
+                    break;
             }
         }
     }

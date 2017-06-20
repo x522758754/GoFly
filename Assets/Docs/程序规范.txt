@@ -1,0 +1,5 @@
+保证每一个UI类必须可复用，与系统逻辑类分开
+以此，文件分类：UI prefab
+				UI View
+				Logic
+				Model
