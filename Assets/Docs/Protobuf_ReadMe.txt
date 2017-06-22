@@ -1,4 +1,6 @@
-Protobuf格式协议和xml一样具有平台独立性，可以在不同平台间通信，
+Protocolbuffer是google的一种数据交换的格式,独立与语言和平台
+类似于xml具有平台独立性，可以在不同平台间通信，
+
 通信所需资源很少，并可以扩展。
 Protobuf-net当然就是Protobuf在.net环境下的移植。
 

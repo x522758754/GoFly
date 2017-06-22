@@ -18,10 +18,14 @@ namespace NetWork
         public static byte[] Encode(Packet packet)
         {
             int len = 0;
-            byte[] codeBytes = GetBytes(packet.nCode);  //不要直接用BinaryWriter.write(int) 可能端的大小不一样
+
+            byte[] sessionBytes = GetBytes(packet.uSession);  //不要直接用BinaryWriter.write(int) 可能端的大小不一样
+            len += sessionBytes.Length;
+
+            byte[] codeBytes = GetBytes(packet.nCode);
             len += codeBytes.Length;
 
-            byte[] bodyBytes = GetBytes(packet.objBody);
+            byte[] bodyBytes = GetBytes(packet.msgBody);
             len += bodyBytes.Length;
 
             byte[] lengthBytes = GetBytes(len);
@@ -31,8 +35,9 @@ namespace NetWork
             {
                 BinaryWriter br = new BinaryWriter(ms);
 
-                ///备注：发送内容=长度（nCode和body所占字节长度） + nCode + body
+                ///备注：发送内容=长度（nCode和body所占字节长度） + sessionId + nCode + body
                 br.Write(lengthBytes);
+                br.Write(sessionBytes);
                 br.Write(codeBytes);
                 br.Write(bodyBytes);
 
@@ -51,7 +56,7 @@ namespace NetWork
         public static Packet Decode(byte[] bytes)
         {
             int offset = 0;
-            int len = Decode(bytes, ref offset);
+            int len = DecodeInt(bytes, ref offset);
             
 
             Packet p = null;
@@ -59,7 +64,7 @@ namespace NetWork
             return p;
         }
 
-        public static int Decode(byte[] bytes, ref int offset)
+        public static int DecodeInt(byte[] bytes, ref int offset)
         {
             //需要判断bytes的Length
             try
@@ -79,7 +84,33 @@ namespace NetWork
             }
         }
 
+        public static uint DecodeUInt(byte[] bytes, ref int offset)
+        {
+            //需要判断bytes的Length
+            try
+            {
+                uint value = BitConverter.ToUInt32(bytes, offset);
+                offset += GetIntLength();
+
+                //注意端的大小
+                //value = IPAddress.NetworkToHostOrder(value)
+
+                return value;
+            }
+            catch (Exception e)
+            {
+                LoggerHelper.Except(e);
+                return 0;
+            }
+        }
+
         public static byte[] GetBytes(int value)
+        {
+            byte[] bytes = BitConverter.GetBytes(value);
+            return bytes;
+        }
+
+        public static byte[] GetBytes(uint value)
         {
             byte[] bytes = BitConverter.GetBytes(value);
             return bytes;

@@ -43,13 +43,14 @@ namespace NetWork
             if(null != data)
             {
                 int offset = 0;
-                int nCode = NetEnCoder.Decode(data, ref offset);
+                uint uSession = NetEnCoder.DecodeUInt(data, ref offset);
+                int nCode = NetEnCoder.DecodeInt(data, ref offset);
                 int nCount = data.Length - offset;
                 object msg = PBEnCoder.Decode(nCode, data, offset, nCount);
 
                 if(0 != nCode)
                 {
-                    HandleMsg(nCode, msg);
+                    HandleMsg(uSession, nCode, msg);
                 }
 
                 ReadData();
@@ -106,7 +107,7 @@ namespace NetWork
             }
         }
 
-        private void HandleMsg(int code, object msg)
+        private void HandleMsg(uint uSession, int code, object msg)
         {
             switch((PBCodeEnum)code)
             {
@@ -116,7 +117,7 @@ namespace NetWork
                         SCHeartBeat heart = new SCHeartBeat();
                         heart.clientTime = CommonHelper._UtcNowMs;
                         heart.serverTime = CommonHelper._UtcNowMs + 1;
-                        Packet p = new Packet((int)PBCodeEnum.SCHeartBeat, heart);
+                        Packet p = new Packet(uSession, (int)PBCodeEnum.SCHeartBeat, heart);
                         byte[] bytes = NetEnCoder.Encode(p);
                         WriteSendData(bytes);
                     }
@@ -127,7 +128,7 @@ namespace NetWork
                         SCLogin login = new SCLogin();
                         login.errorCode = 0;
                         login.loginRet = 1;
-                        Packet p = new Packet((int)PBCodeEnum.SCLogin, login);
+                        Packet p = new Packet(uSession, (int)PBCodeEnum.SCLogin, login);
                         byte[] bytes = NetEnCoder.Encode(p);
                         WriteSendData(bytes);
                     }

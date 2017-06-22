@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using NetWork;
+using Util;
 
 namespace UI
 {
@@ -9,7 +10,6 @@ namespace UI
         public UILabel m_lbServerContent;
         public UILabel m_lbClientContent;
 
-        private TcpClientWorker m_client = new TcpClientWorker();
 
         protected override void DoOpen()
         {
@@ -32,36 +32,30 @@ namespace UI
 
         public void OnBtnConnect()
         {
-            m_client.Connect("127.0.0.1", 5555);
+            NetTcpManager.Instance.Init();
         }
 
         public void OnBtnClientSend()
         {
-            //m_client.Send();
+            CSLogin msg = new CSLogin();
+            msg.deviceKey = "asus";
+            msg.ip = "127.0.0.1";
+
+            NetTcpManager.Instance.Send((int)PBCodeEnum.CSLogin, msg, ShowContent, "xxx");
         }
 
-        public void ShowContent(NetModel it)
+        public void ShowContent(bool isSuccessm, Packet p, object userObj)
         {
-            if(null != it)
-                m_lbServerContent.text = it.Message;
+            if (true)
+                m_lbServerContent.text = string.Format("{0} {1}", p, userObj);
         }
 
         public void OnToggleOne()
         {
-            CSLogin msg = new CSLogin();
-            msg.deviceKey = "asus";
-            msg.ip = "127.0.0.1";
-            Packet p = new Packet((int)PBCodeEnum.CSLogin, msg);
 
-            m_client.Send(p);
         }
         public void OnToggleTwo()
         {
-            CSHeartBeat msg = new CSHeartBeat();
-            msg.clientTime = CommonHelper._UtcNowMs;
-            Packet p = new Packet((int)PBCodeEnum.CSHeartBeat, msg);
-
-            m_client.Send(p);
         }
         public void OnToggleThree()
         {
@@ -70,11 +64,17 @@ namespace UI
 
         public void OnDestroy()
         {
-            m_client.Release();
+            NetTcpManager.Instance.Release();
         }
         public void OnDisable()
         {
             //m_client.Close();
+        }
+
+        public void Update()
+        {
+            NetTcpManager.Instance.Recv();
+            TimerHeap.Tick();
         }
     }
 }

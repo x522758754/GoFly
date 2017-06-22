@@ -20,6 +20,7 @@ char / float / double / bool
 .NET是微软的一个框架，.NET是一个平台，一个抽象的平台的概念。.NET平台其本身实现的方式其实还是库，抽象层面上来看是一个平台
 。C#是微软创造的语言，C#是一个程序设计语言，仅仅是一个语言那时候可以说就是为.NET设计的,但是微软的.NET事实上还支持VB...
 也有开源的C#版本，叫Mono，Linux和Mac上用，也带一个.NET实现
+Mono跨平台基于Mono VM： http://www.cnblogs.com/murongxiaopifu/p/4211964.html
 
 托管资源指的是.NET可以自动进行回收的资源，一般是指被CLR控制的内存资源;
 主要是指托管堆上分配的内存资源,例如程序中分配的对象，作用域内的变量等

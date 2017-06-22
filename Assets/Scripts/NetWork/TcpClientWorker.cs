@@ -232,7 +232,6 @@ namespace NetWork
             }
         }
 
-
         /// <summary>
         /// 处理网络接收
         /// </summary>
@@ -289,18 +288,21 @@ namespace NetWork
                 {
                     try
                     {
-                        //备注：消息协议=长度（nCode和body所占字节长度） + nCode + body
-                        int nLength = NetEnCoder.Decode(m_recvBuffer, ref offset);//nocde + body 所占字节数
+                        //备注：消息协议=长度（nCode和body所占字节长度） + sessionId +  nCode + body
+                        int nLength = NetEnCoder.DecodeInt(m_recvBuffer, ref offset);//nocde + body 所占字节数
                         m_recvUnreadBytes -= offset;
 
                         if (m_recvUnreadBytes >= nLength)
-                        { 
-                            int nCode = NetEnCoder.Decode(m_recvBuffer, ref offset);
+                        {
 
-                            int nCount = nLength - NetEnCoder.GetIntLength();
+                            uint uSession = NetEnCoder.DecodeUInt(m_recvBuffer, ref offset);
+
+                            int nCode = NetEnCoder.DecodeInt(m_recvBuffer, ref offset);
+
+                            int nCount = nLength - 2 * NetEnCoder.GetIntLength();
                             object msg = PBEnCoder.Decode(nCode, m_recvBuffer, offset, nCount);
 
-                            Packet packet = new Packet(nCode, msg);
+                            Packet packet = new Packet(uSession, nCode, msg);
                             lock(m_recvQueueLocker)
                             {
                                 LoggerHelper.Log(packet.ToString());
