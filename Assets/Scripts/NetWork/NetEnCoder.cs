@@ -22,7 +22,7 @@ namespace NetWork
             byte[] sessionBytes = GetBytes(packet.uSession);  //不要直接用BinaryWriter.write(int) 可能端的大小不一样
             len += sessionBytes.Length;
 
-            byte[] codeBytes = GetBytes(packet.nCode);
+            byte[] codeBytes = GetBytes(packet.uCode);
             len += codeBytes.Length;
 
             byte[] bodyBytes = GetBytes(packet.msgBody);

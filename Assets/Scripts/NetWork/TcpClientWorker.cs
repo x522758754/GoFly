@@ -297,12 +297,12 @@ namespace NetWork
 
                             uint uSession = NetEnCoder.DecodeUInt(m_recvBuffer, ref offset);
 
-                            int nCode = NetEnCoder.DecodeInt(m_recvBuffer, ref offset);
+                            uint uCode = NetEnCoder.DecodeUInt(m_recvBuffer, ref offset);
 
                             int nCount = nLength - 2 * NetEnCoder.GetIntLength();
-                            object msg = PBEnCoder.Decode(nCode, m_recvBuffer, offset, nCount);
+                            object msg = PBEnCoder.Decode(uCode, m_recvBuffer, offset, nCount);
 
-                            Packet packet = new Packet(uSession, nCode, msg);
+                            Packet packet = new Packet(uSession, uCode, msg);
                             lock(m_recvQueueLocker)
                             {
                                 LoggerHelper.Log(packet.ToString());

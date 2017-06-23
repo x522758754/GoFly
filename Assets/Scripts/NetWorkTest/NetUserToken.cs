@@ -44,13 +44,13 @@ namespace NetWork
             {
                 int offset = 0;
                 uint uSession = NetEnCoder.DecodeUInt(data, ref offset);
-                int nCode = NetEnCoder.DecodeInt(data, ref offset);
+                uint uCode = NetEnCoder.DecodeUInt(data, ref offset);
                 int nCount = data.Length - offset;
-                object msg = PBEnCoder.Decode(nCode, data, offset, nCount);
+                object msg = PBEnCoder.Decode(uCode, data, offset, nCount);
 
-                if(0 != nCode)
+                if(0 != uCode)
                 {
-                    HandleMsg(uSession, nCode, msg);
+                    HandleMsg(uSession, uCode, msg);
                 }
 
                 ReadData();
@@ -107,7 +107,7 @@ namespace NetWork
             }
         }
 
-        private void HandleMsg(uint uSession, int code, object msg)
+        public void HandleMsg(uint uSession, uint code, object msg)
         {
             switch((PBCodeEnum)code)
             {
@@ -117,7 +117,7 @@ namespace NetWork
                         SCHeartBeat heart = new SCHeartBeat();
                         heart.clientTime = CommonHelper._UtcNowMs;
                         heart.serverTime = CommonHelper._UtcNowMs + 1;
-                        Packet p = new Packet(uSession, (int)PBCodeEnum.SCHeartBeat, heart);
+                        Packet p = new Packet(uSession, (uint)PBCodeEnum.SCHeartBeat, heart);
                         byte[] bytes = NetEnCoder.Encode(p);
                         WriteSendData(bytes);
                     }
@@ -128,7 +128,7 @@ namespace NetWork
                         SCLogin login = new SCLogin();
                         login.errorCode = 0;
                         login.loginRet = 1;
-                        Packet p = new Packet(uSession, (int)PBCodeEnum.SCLogin, login);
+                        Packet p = new Packet(uSession, (uint)PBCodeEnum.SCLogin, login);
                         byte[] bytes = NetEnCoder.Encode(p);
                         WriteSendData(bytes);
                     }

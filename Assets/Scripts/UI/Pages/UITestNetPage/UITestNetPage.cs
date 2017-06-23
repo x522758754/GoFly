@@ -28,11 +28,13 @@ namespace UI
 
         public void OnBtnServerSend()
         {
+            NetServer.Instance.Send(PBCodeEnum.CSHeartBeat);
         }
 
         public void OnBtnConnect()
         {
             NetTcpManager.Instance.Init();
+            NetTcpManager.Instance.RegisterPushHandler((int)PBCodeEnum.SCHeartBeat, ShowClientContent);
         }
 
         public void OnBtnClientSend()
@@ -41,25 +43,21 @@ namespace UI
             msg.deviceKey = "asus";
             msg.ip = "127.0.0.1";
 
-            NetTcpManager.Instance.Send((int)PBCodeEnum.CSLogin, msg, ShowContent, "xxx");
+            NetTcpManager.Instance.Send((int)PBCodeEnum.CSLogin, msg, ShowServerContent, "xxx");
         }
 
-        public void ShowContent(bool isSuccessm, Packet p, object userObj)
+        public void ShowServerContent(bool isSuccessm, Packet p, object userObj)
         {
-            if (true)
+            if (isSuccessm)
                 m_lbServerContent.text = string.Format("{0} {1}", p, userObj);
         }
 
-        public void OnToggleOne()
+        public void ShowClientContent(Packet p)
         {
-
-        }
-        public void OnToggleTwo()
-        {
-        }
-        public void OnToggleThree()
-        {
-
+            if (null != p)
+            {
+                m_lbClientContent.text = string.Format("{0}", p);
+            }
         }
 
         public void OnDestroy()

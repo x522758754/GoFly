@@ -15,6 +15,7 @@ namespace NetWork
 
         private Socket server;
         private Stack<NetUserToken> pools;
+        private List<NetUserToken> utList = new List<NetUserToken>();
 
         private NetServer()
         {
@@ -47,6 +48,8 @@ namespace NetWork
                 NetUserToken ut = pools.Pop();
                 ut.socket = client;
                 BeginReceive(ut);
+
+                utList.Add(ut);
 
                 server.BeginAccept(AsyncAceept, null);
             }
@@ -91,6 +94,15 @@ namespace NetWork
         private void print(object o)
         {
             Util.LoggerHelper.Log(o);
+        }
+
+        public void Send(PBCodeEnum code)
+        {
+            for(int i=0; i != utList.Count; ++i)
+            {
+                var ut = utList[i];
+                ut.HandleMsg(0, (uint)code, null);
+            }
         }
     }
 }

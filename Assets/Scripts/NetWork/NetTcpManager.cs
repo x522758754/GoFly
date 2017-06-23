@@ -7,7 +7,19 @@ using Util;
 
 namespace NetWork
 {
-    public delegate void NetTcpHandler(bool isSuccess, Packet p, object customData);
+    /// <summary>
+    /// 会话回调
+    /// </summary>
+    /// <param name="isSuccess">是否成功</param>
+    /// <param name="p">回传信息</param>
+    /// <param name="customData">用户自定义信息</param>
+    public delegate void NetSessionHandler(bool isSuccess, Packet p, object customData);
+    /// <summary>
+    /// 推送通知
+    /// </summary>
+    /// <param name="p"></param>
+    public delegate void NetPushHandler(Packet p);
+
     public class NetTcpManager:Singleton<NetTcpManager>
     {
         #region 数据包头
@@ -29,62 +41,84 @@ namespace NetWork
          * ERROR
          * */
         #endregion
-
-        private TcpClientWorker m_client;
+        
+        /// <summary>
+        /// tcp客户端
+        /// </summary>
+        private TcpClientWorker m_tcpClient;
+        /// <summary>
+        /// 下一个会话id
+        /// </summary>
         private uint m_nNextSessionId;
-        private Dictionary<uint, SendPacket> m_sendPackets;
+        /// <summary>
+        /// 请求会话表(session, SendPacket)
+        /// </summary>
+        private Dictionary<uint, SendPacket> m_sessions;
+        /// <summary>
+        /// 推送表(code, Packet)
+        /// </summary>
+        private Dictionary<uint, NetPushHandler> m_pushHandlers;
 
         public void Init()
         {
-            m_sendPackets = new Dictionary<uint, SendPacket>();
-            m_client = new TcpClientWorker();
+            m_sessions = new Dictionary<uint, SendPacket>();
+            m_pushHandlers = new Dictionary<uint, NetPushHandler>();
+
+            m_tcpClient = new TcpClientWorker();
             string ip = "127.0.0.1"; //端口和ip应该有公共方法进行读取
             int port = 5555;
             LoggerHelper.Log(string.Format("ip: {0}, port: {1}", ip, port));
-            m_client.Connect(ip, port);
+            m_tcpClient.Connect(ip, port);
         }
 
         public void Release()
         {
-            if (null != m_client)
+            if (null != m_tcpClient)
             {
-                m_client.Release();
-                m_client = null;
+                m_tcpClient.Release();
+                m_tcpClient = null;
             }
 
             ResetSession();
         }
 
-        public void Send(int nCode, object pbMsg, NetTcpHandler handler, object customData)
+        public void Send(uint uCode, object pbMsg, NetSessionHandler handler, object customData)
         {
-            SendPacket sendPacket = new SendPacket(AllocatSessionId(), nCode, pbMsg);
+            SendPacket sendPacket = new SendPacket(AllocatSessionId(), uCode, pbMsg);
 
             sendPacket.userCustomData = customData;
             sendPacket.netTcpHandler = handler;
             sendPacket.OnRecvOverTime();
 
-            m_sendPackets.Add(sendPacket.uSession, sendPacket);
+            m_sessions.Add(sendPacket.uSession, sendPacket);
 
-            m_client.Send(sendPacket);
+            m_tcpClient.Send(sendPacket);
         }
 
         public void Recv()
         {
-            if (null == m_client)
+            if (null == m_tcpClient)
                 return;
-            Packet packet = m_client.Recv();
+            Packet packet = m_tcpClient.Recv();
             if (null != packet)
             {
                 uint uSession = packet.uSession;
-                if (m_sendPackets.ContainsKey(uSession))
+                if (m_sessions.ContainsKey(uSession))
                 {
-                    var sp = m_sendPackets[uSession];
+                    var sp = m_sessions[uSession];
                     if (null != sp.netTcpHandler)
                     {
                         sp.netTcpHandler(true, packet, sp.userCustomData);
                     }
 
                     RemoveSession(uSession);
+                }
+                else if(m_pushHandlers.ContainsKey(packet.uCode))
+                {
+                    if (null != m_pushHandlers[packet.uCode])
+                    {
+                        m_pushHandlers[packet.uCode](packet);
+                    }
                 }
 }
         }
@@ -101,7 +135,7 @@ namespace NetWork
             m_nNextSessionId++;
 
             //尾递归
-            return m_sendPackets.ContainsKey(m_nNextSessionId) ? AllocatSessionId() : m_nNextSessionId;
+            return m_sessions.ContainsKey(m_nNextSessionId) ? AllocatSessionId() : m_nNextSessionId;
         }
 
         /// <summary>
@@ -111,17 +145,20 @@ namespace NetWork
         {
             m_nNextSessionId = 0;
 
-            using (var enu = m_sendPackets.GetEnumerator())
+            if(null != m_sessions)
             {
-                while(enu.MoveNext())
+                using (var enu = m_sessions.GetEnumerator())
                 {
-                    var item = enu.Current.Value;
-                    item.netTcpHandler = null;
-                    TimerHeap.DelTimer(item.timerId);
+                    while (enu.MoveNext())
+                    {
+                        var item = enu.Current.Value;
+                        item.netTcpHandler = null;
+                        TimerHeap.DelTimer(item.timerId);
+                    }
                 }
+                m_sessions.Clear();
+                m_sessions = null;
             }
-            m_sendPackets.Clear();
-            m_sendPackets = null;
         }
 
         /// <summary>
@@ -130,12 +167,12 @@ namespace NetWork
         /// <param name="sId"></param>
         public void RemoveSession(uint sId)
         {
-            if(m_sendPackets.ContainsKey(sId))
+            if(m_sessions.ContainsKey(sId))
             {
-                var item = m_sendPackets[sId];
+                var item = m_sessions[sId];
                 item.netTcpHandler = null;
                 TimerHeap.DelTimer(item.timerId);
-                m_sendPackets.Remove(sId);
+                m_sessions.Remove(sId);
             }
         }
 
@@ -147,6 +184,38 @@ namespace NetWork
         {
             //可以配置
             return 10 * 1000;
+        }
+
+        /// <summary>
+        /// 注册推送事件
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="handler"></param>
+        public void RegisterPushHandler(uint code, NetPushHandler handler)
+        {
+            if(m_pushHandlers.ContainsKey(code))
+            {
+                m_pushHandlers[code] += handler;
+            }
+            else
+            {
+                NetPushHandler callback = null;
+                m_pushHandlers.Add(code, callback);
+                m_pushHandlers[code] += handler;
+            }
+        }
+
+        /// <summary>
+        /// 移除推送事件
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="handler"></param>
+        public void RemovePushHandler(uint code, NetPushHandler handler)
+        {
+            if(m_pushHandlers.ContainsKey(code))
+            {
+                m_pushHandlers[code] -= handler;
+            }
         }
     }
 }

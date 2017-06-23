@@ -11,14 +11,14 @@ namespace NetWork
 {
     public class PBEnCoder
     {
-        public static object Decode(int nCode, byte[] bytes, int offset, int count)
+        public static object Decode(uint uCode, byte[] bytes, int offset, int count)
         {
             object result = null;
             try
             {
                 using (MemoryStream m = new MemoryStream(bytes, offset, count))
                 {
-                    switch ((PBCodeEnum)nCode)
+                    switch ((PBCodeEnum)uCode)
                     {
                         #region 错误信息 10000
                         case PBCodeEnum.ErrorMessage:

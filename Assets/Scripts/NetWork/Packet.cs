@@ -14,23 +14,23 @@ namespace NetWork
         /// <summary>
         /// 协议id
         /// </summary>
-        public int nCode;
+        public uint uCode;
 
         /// <summary>
         /// 协议体
         /// </summary>
         public object msgBody;
 
-        public Packet(uint session, int code, object msg)
+        public Packet(uint session, uint code, object msg)
         {
             uSession = session;
-            nCode = code;
+            uCode = code;
             msgBody = msg;
         }
 
         public override string ToString()
         {
-            return string.Format("{0} {1}", nCode, msgBody);
+            return string.Format("{0} {1}", uCode, msgBody);
         }
 
     }
@@ -45,11 +45,11 @@ namespace NetWork
         /// <summary>
         /// 收到服务器消息回调
         /// </summary>
-        public NetTcpHandler netTcpHandler;
+        public NetSessionHandler netTcpHandler;
 
         public uint timerId;
 
-        public SendPacket(uint session, int code, object buffer):base(session, code, buffer)
+        public SendPacket(uint session, uint code, object buffer):base(session, code, buffer)
         {
         }
 
