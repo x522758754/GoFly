@@ -15,7 +15,10 @@ namespace NetWork
 
     public partial class NetEnCoder
     {
-        public static byte[] Encode(Packet packet)
+        /// <summary>
+        /// Tcppacket -> bytes
+        /// </summary>
+        public static byte[] Encode(TcpPacket packet)
         {
             int len = 0;
 
@@ -35,7 +38,7 @@ namespace NetWork
             {
                 BinaryWriter br = new BinaryWriter(ms);
 
-                ///备注：发送内容=长度（nCode和body所占字节长度） + sessionId + nCode + body
+                ///备注：发送内容=长度（uSession+Code+body共占字节长度） + sessionId + nCode + body
                 br.Write(lengthBytes);
                 br.Write(sessionBytes);
                 br.Write(codeBytes);
@@ -49,6 +52,34 @@ namespace NetWork
                 result = ms.ToArray();
             }
 
+
+            return result;
+        }
+
+        public static byte[] Encode(HttpPacket packet)
+        {
+            int len = 0;
+
+            byte[] codeBytes = GetBytes(packet.uCode);
+            len += codeBytes.Length;
+
+            byte[] bodyBytes = GetBytes(packet.msgBody);
+            len += bodyBytes.Length;
+
+            byte[] lengthBytes = GetBytes(len);
+
+            byte[] result = null;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                BinaryWriter br = new BinaryWriter(ms);
+
+                ///备注：发送内容=长度（Code和body所占字节长度） + nCode + body
+                br.Write(lengthBytes);
+                br.Write(codeBytes);
+                br.Write(bodyBytes);
+
+                result = ms.ToArray();
+            }
 
             return result;
         }

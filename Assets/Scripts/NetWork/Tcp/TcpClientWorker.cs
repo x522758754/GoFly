@@ -18,18 +18,18 @@ namespace NetWork
         private Socket m_socket;
         private byte[] m_recvBuffer;
         private byte[] m_sendBuffer;
-        private Queue<Packet> m_sendQueue = new Queue<Packet>();
-        private Queue<Packet> m_recvQueue = new Queue<Packet>();
-        private int m_recvUnreadBytes = 0;//recvBuffer缓存但没被读读取的字节数
+        private Queue<TcpPacket> m_sendQueue = new Queue<TcpPacket>();
+        private Queue<TcpPacket> m_recvQueue = new Queue<TcpPacket>();
+        private int m_recvUnreadBytes;//recvBuffer缓存但没被读读取的字节数
 
         /// <summary>
         /// 线程运行标记
         /// </summary>
         private bool m_threadRunFlag = true;
         /// <summary>
-        /// 异步发送标记
+        /// 网络运行标记
         /// </summary>
-        private bool m_asyncSend = true;
+        private bool m_netRunFlag = true;
         /// <summary>
         /// 网络通信同步锁
         /// </summary>
@@ -111,7 +111,7 @@ namespace NetWork
         /// 供外部调用发送网络消息
         /// </summary>
         /// <param name="p"></param>
-        public void Send(Packet p)
+        public void Send(TcpPacket p)
         {
             if(null == m_socket || (false == m_socket.Connected))
             {
@@ -125,9 +125,9 @@ namespace NetWork
         ///供外部调用接收网络消息
         /// </summary>
         /// <returns></returns>
-        public Packet Recv()
+        public TcpPacket Recv()
         {
-            Packet packet = null;
+            TcpPacket packet = null;
             if (m_recvQueue.Count > 0)
             {
                 lock (m_recvQueueLocker)
@@ -144,7 +144,7 @@ namespace NetWork
         {
             Clear();
 
-            m_asyncSend = false;
+            m_netRunFlag = false;
         }
 
         /// <summary>
@@ -172,7 +172,7 @@ namespace NetWork
         {
             while (m_threadRunFlag)
             {
-                if (true == m_asyncSend)
+                if (true == m_netRunFlag)
                 {
                     DoSend();
                     Thread.Sleep(c_ThreadSleepTime);
@@ -200,7 +200,7 @@ namespace NetWork
             {
                 while (nTotalLength < c_MaxBufferSize && m_sendQueue.Count > 0)
                 {
-                    Packet packet = m_sendQueue.Peek();
+                    TcpPacket packet = m_sendQueue.Peek();
                     byte[] bytes = NetEnCoder.Encode(packet);
 
 
@@ -242,6 +242,11 @@ namespace NetWork
 
             while (m_threadRunFlag)
             {
+                if(!m_netRunFlag)
+                {
+                    continue;
+                }
+
                 try
                 {
                     recvBufferFree = c_MaxBufferSize - m_recvUnreadBytes;
@@ -302,7 +307,7 @@ namespace NetWork
                             int nCount = nLength - 2 * NetEnCoder.GetIntLength();
                             object msg = PBEnCoder.Decode(uCode, m_recvBuffer, offset, nCount);
 
-                            Packet packet = new Packet(uSession, uCode, msg);
+                            TcpPacket packet = new TcpPacket(uSession, uCode, msg);
                             lock(m_recvQueueLocker)
                             {
                                 LoggerHelper.Log(packet.ToString());

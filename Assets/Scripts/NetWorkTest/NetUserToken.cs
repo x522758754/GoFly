@@ -117,7 +117,7 @@ namespace NetWork
                         SCHeartBeat heart = new SCHeartBeat();
                         heart.clientTime = CommonHelper._UtcNowMs;
                         heart.serverTime = CommonHelper._UtcNowMs + 1;
-                        Packet p = new Packet(uSession, (uint)PBCodeEnum.SCHeartBeat, heart);
+                        TcpPacket p = new TcpPacket(uSession, (uint)PBCodeEnum.SCHeartBeat, heart);
                         byte[] bytes = NetEnCoder.Encode(p);
                         WriteSendData(bytes);
                     }
@@ -128,7 +128,7 @@ namespace NetWork
                         SCLogin login = new SCLogin();
                         login.errorCode = 0;
                         login.loginRet = 1;
-                        Packet p = new Packet(uSession, (uint)PBCodeEnum.SCLogin, login);
+                        TcpPacket p = new TcpPacket(uSession, (uint)PBCodeEnum.SCLogin, login);
                         byte[] bytes = NetEnCoder.Encode(p);
                         WriteSendData(bytes);
                     }

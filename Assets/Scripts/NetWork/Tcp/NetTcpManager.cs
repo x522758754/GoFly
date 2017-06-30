@@ -43,6 +43,10 @@ namespace NetWork
         #endregion
         
         /// <summary>
+        /// 网络超时时间
+        /// </summary>
+        public uint OverTime;
+        /// <summary>
         /// tcp客户端
         /// </summary>
         private TcpClientWorker m_tcpClient;
@@ -53,7 +57,7 @@ namespace NetWork
         /// <summary>
         /// 请求会话表(session, SendPacket)
         /// </summary>
-        private Dictionary<uint, SendPacket> m_sessions;
+        private Dictionary<uint, TcpPacket> m_sessions;
         /// <summary>
         /// 推送表(code, Packet)
         /// </summary>
@@ -61,7 +65,7 @@ namespace NetWork
 
         public void Init()
         {
-            m_sessions = new Dictionary<uint, SendPacket>();
+            m_sessions = new Dictionary<uint, TcpPacket>();
             m_pushHandlers = new Dictionary<uint, NetPushHandler>();
 
             m_tcpClient = new TcpClientWorker();
@@ -84,7 +88,7 @@ namespace NetWork
 
         public void Send(uint uCode, object pbMsg, NetSessionHandler handler, object customData)
         {
-            SendPacket sendPacket = new SendPacket(AllocatSessionId(), uCode, pbMsg);
+            TcpPacket sendPacket = new TcpPacket(AllocatSessionId(), uCode, pbMsg);
 
             sendPacket.userCustomData = customData;
             sendPacket.netTcpHandler = handler;
@@ -95,11 +99,14 @@ namespace NetWork
             m_tcpClient.Send(sendPacket);
         }
 
+        /// <summary>
+        /// 供系统帧调用
+        /// </summary>
         public void Recv()
         {
             if (null == m_tcpClient)
                 return;
-            Packet packet = m_tcpClient.Recv();
+            TcpPacket packet = m_tcpClient.Recv();
             if (null != packet)
             {
                 uint uSession = packet.uSession;
@@ -182,8 +189,13 @@ namespace NetWork
         /// <returns></returns>
         public uint RecvOverTime()
         {
-            //可以配置
-            return 10 * 1000;
+            if (0 == OverTime)
+            {
+                //读取配置、暂时设置10s
+                return 10 * 1000;
+            }
+
+            return OverTime;
         }
 
         /// <summary>
