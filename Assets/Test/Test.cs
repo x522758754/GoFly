@@ -13,6 +13,8 @@ using NetWork;
 
 public class Test:MonoBehaviour
 {
+    
+    public object abc = null;
     void Start ()
     {
         

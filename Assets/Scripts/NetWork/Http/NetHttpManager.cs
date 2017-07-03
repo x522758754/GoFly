@@ -34,5 +34,10 @@ namespace NetWork
         {
 
         }
+
+        public string GetUrl()
+        {
+            return string.Empty;
+        }
     }
 }

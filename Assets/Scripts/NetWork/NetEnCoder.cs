@@ -56,6 +56,11 @@ namespace NetWork
             return result;
         }
 
+        /// <summary>
+        /// HttpPacket -> bytes
+        /// </summary>
+        /// <param name="packet"></param>
+        /// <returns></returns>
         public static byte[] Encode(HttpPacket packet)
         {
             int len = 0;
@@ -82,17 +87,6 @@ namespace NetWork
             }
 
             return result;
-        }
-
-        public static Packet Decode(byte[] bytes)
-        {
-            int offset = 0;
-            int len = DecodeInt(bytes, ref offset);
-            
-
-            Packet p = null;
-
-            return p;
         }
 
         public static int DecodeInt(byte[] bytes, ref int offset)

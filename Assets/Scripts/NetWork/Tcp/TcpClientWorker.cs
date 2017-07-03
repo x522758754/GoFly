@@ -49,7 +49,7 @@ namespace NetWork
         /// <summary>
         /// 异步发送数据线程。
         /// </summary>
-        private Thread m_sendThread;
+        private Thread m_sendThread; 
 
 
         public TcpClientWorker()

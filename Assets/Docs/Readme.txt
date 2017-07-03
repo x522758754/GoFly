@@ -37,3 +37,15 @@ Mono跨平台基于Mono VM： http://www.cnblogs.com/murongxiaopifu/p/4211964.html
 		{
 		}
 	}
+
+属性的方法
+public bool IsCompleted { get; private set; }
+
+接口：声明变量
+    public interface IAsyncObject
+    {
+        /// <summary>
+        /// 最终加载结果的资源
+        /// </summary>
+        object AsyncResult { get; }
+	}
