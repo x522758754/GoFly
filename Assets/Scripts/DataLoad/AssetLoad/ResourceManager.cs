@@ -228,7 +228,7 @@ namespace DataLoad
         /// <returns></returns>
         private bool IsNeedCacheUnloadAsset()
         {
-            return false;
+            return true;
         }
 
         /// <summary>

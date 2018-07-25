@@ -49,3 +49,5 @@ public bool IsCompleted { get; private set; }
         /// </summary>
         object AsyncResult { get; }
 	}
+
+อฦผ๖สนำร yield return null

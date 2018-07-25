@@ -15,6 +15,7 @@ namespace AssetLoad
 
         public float Progress
         {
+            get; set;
         }
     }
 }
