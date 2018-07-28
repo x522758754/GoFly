@@ -9,7 +9,8 @@ public class TestCamera : MonoBehaviour
     ///
     ///相机操作基础数据(欧拉角、视角、跟随设置)
     public float _pitch;    //俯仰角[-89,89]
-    public float _yaw;      //偏航角(左手坐标系，以世界坐标系下的相对x轴的旋转角度）
+    public float _yaw;      //偏航角(Unity左手坐标系
+                            //默认情况，不做任何旋转的情况相机的朝向就是vec3(0,0,1),不用做任何调整）
     public float _fovy;     //视锥体的垂直方向上的视野角度
     public float _followDistance;       //跟随距离
     public float _followZoomSpeed;      //跟随推拉速度
@@ -101,24 +102,31 @@ public class TestCamera : MonoBehaviour
         float x = Mathf.Cos(_yaw * Mathf.Deg2Rad);
         float z = Mathf.Sin(_yaw * Mathf.Deg2Rad);
 
+        //相机的朝向
+        Vector3 front = new Vector3(x * Mathf.Cos(_pitch * Mathf.Deg2Rad), y, z * Mathf.Cos(_pitch * Mathf.Deg2Rad));
+        transFollow.forward = -front;
+
+        transFollow.position = _currentTargetPos + _curTargetOffset + front * _currFollowDis;
+
         float distanceProjXZ = _currFollowDis * Mathf.Cos(_pitch * Mathf.Deg2Rad);
         float distanceProjX = distanceProjXZ * x;
         float distanceProjZ = distanceProjXZ * z;
         float distanceProjY = _currFollowDis * y;
         Vector3 ralationPos = new Vector3(distanceProjX, distanceProjY, distanceProjZ);
 
-        transFollow.position = _currentTargetPos + _curTargetOffset + ralationPos;
+       // transFollow.position = _currentTargetPos + _curTargetOffset + ralationPos;
 
         //计算相机震动
         Vector3 shakeCamPos = Vector3.zero;//用annimation做
         Vector3 shakeOffset = transFollow.localToWorldMatrix.MultiplyPoint(shakeCamPos);
-        transFollow.position += shakeOffset;
+        Vector3 worldOffset = shakeOffset - transFollow.position;
+        transFollow.position += worldOffset;
 
 
         Vector3 forward = _currentTargetPos + _curTargetOffset - transFollow.position;
         if (forward.sqrMagnitude >= 0)
         {
-            transFollow.forward = forward;
+   //         transFollow.forward = forward;
         }
     }
 }
