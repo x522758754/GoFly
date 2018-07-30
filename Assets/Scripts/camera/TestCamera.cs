@@ -8,7 +8,7 @@ public class TestCamera : MonoBehaviour
     ///public float _fovx;     //视锥体的水平方向上的视野角度,取决于视口的宽高比
     ///
     ///相机操作基础数据(欧拉角、视角、跟随设置)
-    public float _pitch;    //俯仰角[-89,89]
+    public float _pitch;    //俯仰角[-89,89],避免造成万向锁
     public float _yaw;      //偏航角(Unity左手坐标系
                             //默认情况，不做任何旋转的情况相机的朝向就是vec3(0,0,1),不用做任何调整）
     public float _fovy;     //视锥体的垂直方向上的视野角度
@@ -102,19 +102,12 @@ public class TestCamera : MonoBehaviour
         float x = Mathf.Cos(_yaw * Mathf.Deg2Rad);
         float z = Mathf.Sin(_yaw * Mathf.Deg2Rad);
 
-        //相机的朝向
+        //相机的朝向根据相机的欧拉角计算得到
         Vector3 front = new Vector3(x * Mathf.Cos(_pitch * Mathf.Deg2Rad), y, z * Mathf.Cos(_pitch * Mathf.Deg2Rad));
         transFollow.forward = -front;
-
+        
+        //设置相机的位置
         transFollow.position = _currentTargetPos + _curTargetOffset + front * _currFollowDis;
-
-        float distanceProjXZ = _currFollowDis * Mathf.Cos(_pitch * Mathf.Deg2Rad);
-        float distanceProjX = distanceProjXZ * x;
-        float distanceProjZ = distanceProjXZ * z;
-        float distanceProjY = _currFollowDis * y;
-        Vector3 ralationPos = new Vector3(distanceProjX, distanceProjY, distanceProjZ);
-
-       // transFollow.position = _currentTargetPos + _curTargetOffset + ralationPos;
 
         //计算相机震动
         Vector3 shakeCamPos = Vector3.zero;//用annimation做
@@ -122,11 +115,11 @@ public class TestCamera : MonoBehaviour
         Vector3 worldOffset = shakeOffset - transFollow.position;
         transFollow.position += worldOffset;
 
-
-        Vector3 forward = _currentTargetPos + _curTargetOffset - transFollow.position;
-        if (forward.sqrMagnitude >= 0)
-        {
-   //         transFollow.forward = forward;
-        }
+        //相机在每个坐标轴的相对位置
+        float distanceProjXZ = _currFollowDis * Mathf.Cos(_pitch * Mathf.Deg2Rad);
+        float distanceProjX = distanceProjXZ * x;
+        float distanceProjZ = distanceProjXZ * z;
+        float distanceProjY = _currFollowDis * y;
+        Vector3 ralationPos = new Vector3(distanceProjX, distanceProjY, distanceProjZ);
     }
 }
