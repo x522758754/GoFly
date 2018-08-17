@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TestCamera : MonoBehaviour
+public class ThirdCamera : MonoBehaviour
 {
     ///public float _roll;     //翻滚角不考虑使用
     ///public float _fovx;     //视锥体的水平方向上的视野角度,取决于视口的宽高比
-    ///
+    
     ///相机操作基础数据(欧拉角、视角、跟随设置)
     public float _pitch;    //俯仰角[-89,89],避免造成万向锁
     public float _yaw;      //偏航角(Unity左手坐标系
