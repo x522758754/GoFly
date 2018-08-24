@@ -95,7 +95,16 @@ public class DbgRenderMesh{
 		return m_Triangles.Count;
 	}
 
-	private void ComputeBounds(){
+    public void GetBounds(out Vector3 min, out Vector3 center, out Vector3 max)
+    {
+        ComputeBounds();
+        min = m_Min;
+        center = m_BBCenter;
+        max = m_Max;
+    }
+
+
+    private void ComputeBounds(){
 		m_BBCenter = GetBoundingBoxCenter(m_Triangles,0, m_Triangles.Count, ref m_Min, ref m_Max);
 		m_BoundsComputed = true;
 	}

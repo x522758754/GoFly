@@ -26,7 +26,7 @@ public class NavToolsEditor : Editor
             ofn.maxFile = ofn.file.Length;
             ofn.fileTitle = new string(new char[64]);
             ofn.maxFileTitle = ofn.fileTitle.Length;
-            ofn.initialDir = UnityEngine.Application.dataPath;//默认路径
+            ofn.initialDir = Application.dataPath;//默认路径
             ofn.title = "Open Project";
             ofn.defExt = "bin";//显示文件的类型
             //注意 一下项目不一定要全选 但是0x00000008项不要缺少
@@ -35,21 +35,6 @@ public class NavToolsEditor : Editor
             {
                 navTools.LoadMap(ofn.file);
             }
-        }
-
-        if(GUILayout.Button("load ob"))
-        {
-
-        }
-
-        if(GUILayout.Button("clear ob"))
-        {
-
-        }
-
-        if(GUILayout.Button("save ob"))
-        {
-
         }
 
         if(GUILayout.Button("test navmesh"))
