@@ -11,6 +11,7 @@ public class NavToolsEditor : Editor
     {
         navTools = target as NavTools;
     }
+
     public override void OnInspectorGUI()
     {
         //EditorGUILayout.BeginHorizontal();
@@ -39,9 +40,7 @@ public class NavToolsEditor : Editor
 
         if(GUILayout.Button("test navmesh"))
         {
-            //批量生成生成机器人自动跑场景，随机设置目标点寻路
-            ///寻找跑不到目标点 或者从场景中掉下去的点打印出来
-
+            navTools.StartNavTest();
         }
     }
 }

@@ -49,13 +49,13 @@ public class RecastHelper
     public static extern bool is_valid_pos(float[] pos);
 
     [DllImport(dll_name)]
-    public static extern void find_path(float[] start, float[] end, out float[] paths, out int pathCount);
+    public static extern void find_path(float[] start, float[] end, float[] paths, out int pathCount, out float distance);
 
     [DllImport(dll_name)]
     public static extern bool is_hit_ob(float[] start, float[] end);
 
     [DllImport(dll_name)]
-    public static extern void raycast(float[] start, float[] end, out float[] hitPoint, out float[] hitNormal);
+    public static extern bool raycast(float[] start, float[] end, float[] hitPoint, float[] hitNormal);
 
     [DllImport(dll_name)]
     public static extern void get_pos_height(float[] pos, out float height);

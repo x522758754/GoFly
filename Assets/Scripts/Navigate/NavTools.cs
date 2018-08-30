@@ -5,13 +5,18 @@ using UnityEngine;
 //Unity调试Recast工具
 public class NavTools : MonoBehaviour
 {
-    public float m_pathSpace = 0.1f;
+    public float m_pathSpace = 5f;
     bool m_ret = false;
     DbgRenderMesh m_dbgRenderMesh = new DbgRenderMesh();
     GameObject m_goDbg;
     private List<Vector3> targetList = new List<Vector3>();
     private List<Vector3> bornList = new List<Vector3>();
     private List<RecastDetour> rdList = new List<RecastDetour>();
+
+    void Start()
+    {
+        LoadMap("E:\\Work\\FairyTail\\client\\Output\\data\\mapbin\\1000_zhucheng_ground.bin");
+    }
 
     public void LoadMap(string path)
     {
@@ -25,16 +30,16 @@ public class NavTools : MonoBehaviour
         CreateDbgRenderMesh();
 
         ///1 tri => 3 verts, 1 verts = 1 pos(vec3) => 3 float
-        int triCount = RecastHelper.get_mesh_vert_count();
-        float[] vertPos = new float[triCount * 9];
+        int vertCount = RecastHelper.get_mesh_vert_count();
+        float[] vertPos = new float[vertCount*3];
         RecastHelper.get_mesh_vert_pos(vertPos);
         Color col = new Color();
 
-        for (int i=0; i != triCount; ++i)
+        for (int i=0; i < vertCount*3; i += 9)
         {
-            Vector3 a = new Vector3(vertPos[i * 9 + 0], vertPos[i * 9 + 1], vertPos[i * 9 + 2]);
-            Vector3 b = new Vector3(vertPos[i * 9 + 3], vertPos[i * 9 + 4], vertPos[i * 9 + 5]);
-            Vector3 c = new Vector3(vertPos[i * 9 + 6], vertPos[i * 9 + 7], vertPos[i * 9 + 8]);
+            Vector3 a = new Vector3(vertPos[i+0], vertPos[i + 1], vertPos[i + 2]);
+            Vector3 b = new Vector3(vertPos[i + 3], vertPos[i + 4], vertPos[i + 5]);
+            Vector3 c = new Vector3(vertPos[i + 6], vertPos[i + 7], vertPos[i + 8]);
 
             m_dbgRenderMesh.AddTriangle(new DbgRenderTriangle(a, b, c, col));
             Vector3 triCenter = (a + b + c) / 3;
@@ -65,15 +70,16 @@ public class NavTools : MonoBehaviour
     public void StartNavTest()
     {
         if (!m_ret) return;
-        for (int i=0; i != bornList.Count; ++i)
+
+        for (int i=0; i != 1; ++i)
         {
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             go.transform.position = bornList[i];
-            go.transform.localScale = Vector3.one;
+            go.transform.localScale = Vector3.one * 3;
             go.name = "robot_" + i.ToString();
-            if (m_goDbg)
+            if (false && m_goDbg)
                 go.transform.parent = m_goDbg.transform;
-
+            
             RecastDetour rd = go.AddComponent<RecastDetour>();
             rd.targetList = targetList;
             rdList.Add(rd);
@@ -86,13 +92,16 @@ public class NavTools : MonoBehaviour
         Shader shader = Shader.Find("Diffuse");
         Material m = new Material(shader);
         m_goDbg = m_dbgRenderMesh.CreateGameObject("DbgRenderMesh", m);
+        m_goDbg.layer = LayerMask.NameToLayer("Ground");
         m_dbgRenderMesh.Clear();
     }
 
     private void BuildPathMap()
     {
+        targetList.Clear();
         Vector3 min, center, max;
         m_dbgRenderMesh.GetBounds(out min, out center, out max);
+
         for (float i = min.x; i < max.x;)
         {
             for (float j = min.z; j < max.z;)
@@ -109,5 +118,12 @@ public class NavTools : MonoBehaviour
         }
     }
 
+    public static float GetHeight(float x, float z)
+    {
+        Vector3 vPos = new Vector3(x, 10000f, z);
 
+        RaycastHit hitInfo;
+        bool bRet = Physics.Raycast(vPos, Vector3.down, out hitInfo, 20000f, LayerMask.GetMask("Ground"));
+        return bRet ? hitInfo.point.y : 0;
+    }
 }

@@ -173,7 +173,12 @@ public class DbgRenderMesh{
 	public void Rebuild(){
 		if (m_Mesh){
 			RenderTo(m_Mesh);
-		}
+
+            MeshCollider collider = m_GameObject.GetComponent<MeshCollider>();
+            if (!collider)
+                collider = m_GameObject.AddComponent<MeshCollider>();
+            collider.sharedMesh = m_Mesh;
+        }
 	}
 	
 	public void Clear(){
@@ -308,6 +313,7 @@ public class DbgRenderMesh{
 		if (m_MeshRenderer == null){
 			m_MeshRenderer = target.AddComponent<MeshRenderer>();
 		}
+
 		m_Mesh = new Mesh();
 		m_MeshFilter.mesh = m_Mesh;
 		m_BoundsComputed = false;
