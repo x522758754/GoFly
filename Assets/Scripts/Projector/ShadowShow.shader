@@ -17,7 +17,7 @@ Shader "Unlit/ShadowShow"
 			// don't change depths
 			//保证我们不会改变depth buffer，因为我们添加投影到目标物上，而该目标物早已光栅化完了
 			ZWrite Off
-			//混合是图形已经别渲染到了屏幕，所有的shader都已经执行，所有贴图都已经附上，这个时候执行的操作。
+			//混合时注意目标物的shader执行顺序，应在当前shader之前执行
 			//Blending就是控制透明的。处于光栅化的最后阶段。
 			//Blend SrcFactor DstFactor,SrcFactorA DstFactorA
 			//混合颜色 = 当前片元颜色*SrcFactor  + 存在颜色缓冲里面的颜色*DstFactor
@@ -27,6 +27,9 @@ Shader "Unlit/ShadowShow"
 			// avoid depth fighting
 			//轻微的改变投影深度值,使我们当前的投影在目标物之前，确保不会被目标物挡到
 			Offset -1, -1
+
+			//AlphaTest Greater 0
+			ColorMask RGB
 
 			CGPROGRAM
 			#pragma vertex vert
@@ -70,15 +73,14 @@ Shader "Unlit/ShadowShow"
 				fixed4 projTex = tex2D(_DepthTex, i.posProj.xy / i.posProj.w); //透视除法:i.posProj.xy / i.posProj.w
 				//alternative: fixed4 tex = tex2Dproj(_DepthTex, i.posProj);
 				
-				fixed fade = tex2D(_FadeTex, i.posProj.xy / i.posProj.w);
-				fixed fadeout = tex2D(_FadeTex, i.fposProj.xy / i.fposProj.w);
+				fixed fade = tex2D(_FadeTex, i.posProj.xy / i.posProj.w).r; //阴影衰减方式1：边缘衰减
+				fixed fadeout = tex2D(_FadeTex, i.fposProj.xy / i.fposProj.w).g; ////阴影衰减方式1：远近衰减
 				
 				fixed4 result;
-				result.rgb = lerp(fixed3(1, 1, 1), 1 - projTex.a, fadeout)*1.3;
+				result.rgb = lerp(fixed3(1, 1, 1), 1 - projTex.r, fadeout)*1.3;
 				result.rgb += 1 - fade;
 				result.a = 1;
 				return result;
-				//return fixed4(projTex.r, 0, 0, _AlphaScale); //(0, 1, 0, 1.0)
 			}
 
 			ENDCG
