@@ -1,46 +1,63 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class RenderShader : MonoBehaviour
 {
-    public Shader shaderProj;
-    public Camera cameraProj;
-    public List<LayerMask> layers; //设置渲染目标的Layer
+    public Shader projShader;
+    public Camera projCam;
+    public LayerMask setLayers; //设置渲染目标的Layer
+    public float cullDistance = 32f; //层消隐距离
 
     private void Start()
     {
-        if (!cameraProj)
+        if (projCam)
         {
-            //关闭自动渲染，改成手动渲染
-            cameraProj.enabled = false;
-            //设置要渲染的Layer,消隐距离
+            ///canera自定义设置
+
+            ///关闭自动渲染，改成手动渲染
+            ///防止camera 发送其它渲染事件，被其它脚本捕捉，加工处理
+            projCam.enabled = false;
+
+            ///设置要渲染的Layers
+            projCam.cullingMask = setLayers.value;
+
+            ///设置要渲染的Layer,消隐距离
             float[] distances = new float[32];
-            for (int i=0; i !=  32; ++i)
+            for (int i=0; i != 32; ++i)
             {
                 distances[i] = 0;
+                if(1 == ((1 << i & projCam.cullingMask) >> i))
+                    distances[i] = cullDistance;
+
             }
-            for(int i=0; i != layers.Count; ++i)
-            {
-                int iLayer = layers[i].value;
-                distances[iLayer] = 32;
-            }
-            cameraProj.layerCullDistances = distances;
-            cameraProj.depthTextureMode = DepthTextureMode.None;
-            cameraProj.backgroundColor = Color.black;
-            cameraProj.clearFlags = CameraClearFlags.SolidColor;
-            cameraProj.renderingPath = RenderingPath.Forward;
+            projCam.layerCullDistances = distances;
+
+            ///
+            //projCam.layerCullSpherical = true;
+
+            ///背景色黑色
+            projCam.clearFlags = CameraClearFlags.SolidColor;
+            projCam.backgroundColor = Color.black;
+            
+            ///其它设置
+            projCam.depthTextureMode = DepthTextureMode.None;
+            projCam.renderingPath = RenderingPath.Forward;
         }
 
     }
 
     private void LateUpdate()
     {
-        if (cameraProj && shaderProj)
+        if (projCam && projShader)
         {
-            GL.invertCulling = true; //渲染的顶点做翻转操作，不会对法线，待测试
-            cameraProj.RenderWithShader(shaderProj, "ShadowProj");
+            //渲染的顶点做翻转操作，不会对法线，待测试
+            GL.invertCulling = true;
+            ///手动渲染，渲染特定shader的物体
+            projCam.RenderWithShader(projShader, "ShadowProj");
             GL.invertCulling = false;
         }
     }
+
 }
