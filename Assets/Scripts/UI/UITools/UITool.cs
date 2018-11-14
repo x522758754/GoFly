@@ -89,7 +89,7 @@ namespace UI
         public static GameObject FindChild(GameObject parent, string childName)
         {
             if (null != parent)
-                return parent.transform.FindChild(childName).gameObject;
+                return parent.transform.Find(childName).gameObject;
             else
                 return null;
         }

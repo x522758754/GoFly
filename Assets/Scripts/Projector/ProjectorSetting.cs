@@ -39,7 +39,7 @@ public class ProjectorSetting : MonoBehaviour
     {
         if (!projCam) return;
 
-        projShader = Shader.Find("Unlit/ShadowCreate");
+        projShader = Shader.Find("Unlit/ShadowCreate_S");
 
         ///canera自定义设置
 
@@ -78,7 +78,8 @@ public class ProjectorSetting : MonoBehaviour
         ///待测试 使用链接的第4种方式使用RenderTexture，进一步优化
 
         //rt = RenderTexture.GetTemporary(texWidth, texWidth, 0, RenderTextureFormat.Depth);
-        rt = new RenderTexture(texWidth, texWidth, 16, RenderTextureFormat.Depth);
+        //rt = new RenderTexture(texWidth, texWidth, 16, RenderTextureFormat.Depth); //对应ShadowCreate
+        rt = new RenderTexture(texWidth, texWidth, 0, RenderTextureFormat.R8); //对应ShadowCreate_S
         rt.name = "projectorRT";
         projCam.targetTexture = rt;
 
