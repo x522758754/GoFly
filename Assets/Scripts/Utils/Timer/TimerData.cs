@@ -53,7 +53,8 @@ namespace Util
 
         public override void DoAction()
         {
-            m_action();
+            if (m_action != null)
+                m_action();
         }
     }
 
@@ -81,7 +82,8 @@ namespace Util
 
         public override void DoAction()
         {
-            m_action(m_arg1);
+            if (m_action != null)
+                m_action(m_arg1);
         }
     }
 
@@ -118,7 +120,8 @@ namespace Util
 
         public override void DoAction()
         {
-            m_action(m_arg1, m_arg2);
+            if (m_action != null)
+                m_action(m_arg1, m_arg2);
         }
     }
 
@@ -164,7 +167,8 @@ namespace Util
 
         public override void DoAction()
         {
-            m_action(m_arg1, m_arg2, m_arg3);
+            if(m_action != null)
+                m_action(m_arg1, m_arg2, m_arg3);
         }
     }
 }

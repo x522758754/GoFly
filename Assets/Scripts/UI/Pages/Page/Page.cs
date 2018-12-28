@@ -205,5 +205,21 @@ namespace UI
         {
             Debug.Log("Cover page open");
         }
+
+        /// <summary>
+        /// 网络断开连接
+        /// </summary>
+        public virtual void OnDisconnect()
+        {
+
+        }
+
+        /// <summary>
+        /// 网络重新连接
+        /// </summary>
+        public virtual void OnReconnect()
+        {
+
+        }
 	}
 }
