@@ -1,5 +1,5 @@
 ﻿/*
- * AB加载器
+ * AB加载器：BundleLoader
  */
 using System.Collections;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Diagnostics;
 using UnityEngine;
 using System.IO;
 
-public class ABLoader
+public class BundleLoader
 {
     public const string AbPostfix = "";         //ab后缀，
     public const string AbDownloadPath = "";    //下载路径，Application.persistentDataPath +
@@ -75,7 +75,8 @@ public class ABLoader
     //释放
     public void Release()
     {
-
+        //清理数据
+        //释放mainifest ab
     }
 
     //释放无用的ab资源(在非加载阶段轮询)
@@ -187,10 +188,26 @@ public class ABLoader
         return asset;
     }
 
-    //1.2 从ab中异步加载资源
-    public T LoadObject<T>() where T : Object
+    //1.2 从ab中异步加载资源(同步加载ab，异步从ab中加载资源);待考虑：1上层调用时，异步加载的优先级 2限制每帧加载数量（分帧加载，依据加载ab的时间、数量））
+    public IEnumerator LoadObjectAsync<T>(string abPath, string assetName) where T : Object
     {
-        return null;
+        AssetBundle ab = LoadAb(abPath);
+        if (ab == null)
+            yield break;
+
+        m_abFreQueue.Use(abPath);
+        AssetBundleRequest req = ab.LoadAssetAsync<T>(assetName);
+        yield return req;
+        T asset = req.asset as T;
+        if (asset != null)
+        {
+            //记录资源id映射ab引用，此处不增加引用计数
+            var assetRef = m_abRefMgr.GetOrCreateRef(ab);
+            int instId = asset.GetInstanceID();
+            m_cacheAsset2abRef.Add(instId, assetRef);
+
+            //上层调用接口，根据需求再定制是否引用
+        }
     }
 
     //2.加载ab（包括ab的依赖）
@@ -340,5 +357,23 @@ public class ABLoader
 
         var instId = asset.GetInstanceID();
         return m_abRefMgr.HasRef(instId);
+    }
+
+    private AssetRef GetAssetRef(Object asset)
+    {
+        if (asset == null)
+            return null;
+
+        int instId = asset.GetInstanceID();
+        if (m_cacheAsset2abRef.ContainsKey(instId))
+        {
+            var assetRef = m_cacheAsset2abRef[instId];
+            if(assetRef != null && !assetRef.Invalid())
+            {
+                return assetRef;
+            }
+        }
+
+        return null;
     }
 }
