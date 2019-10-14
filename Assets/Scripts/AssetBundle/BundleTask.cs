@@ -46,7 +46,7 @@ public class TaskData<T, U, V> where T : UnityEngine.Object
     public U Agr1;
     public V Agr2;
 
-    public Action<T, U> Action;
+    public Action<T, U, V> Action;
 
     public void DoActon()
     {

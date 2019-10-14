@@ -30,8 +30,8 @@ public class MinimapMaker : MonoBehaviour
 {
     public string outputDir = "";
     public int mapId = 0;
-    public int texWidth = 1280;
-    public int texHeight = 720;
+    public int texWidth = 1280;//生成的分辨率，width
+    public int texHeight = 720;//生成的分辨率，height
 
     public MinimapData minimapData;
    
@@ -41,7 +41,13 @@ public class MinimapMaker : MonoBehaviour
 	void Start ()
     {
         cam = this.gameObject.GetComponent<Camera>();
-	}
+
+        Debug.Log(Screen.width);
+        Debug.Log(Screen.height);
+
+        Screen.SetResolution(texWidth, texHeight, true);
+
+    }
 
     Vector2 Rotate(Vector2 pos, Vector2 center, float angle)
     {
@@ -80,7 +86,7 @@ public class MinimapMaker : MonoBehaviour
         /// 1   0   minimapCenter.x     cos(yRotate)    -sin(yRotate)   0       1   0   -minimapCenter.x        x
         ///[0   1   minimapCenter.y] * [sin(yRotate)    cos(yRotate)    0] * [  0   1   -minimapCenter.y] * [   y   ]
         /// 0   0   1                   0               0               1       0   0   1                       1
-        ///相机没旋转时,图片对应的信息
+        ///相机没旋转时,图片对应的信息对应的坐标信息
         Vector2 minimapCenter = new Vector2(cam.transform.position.x, cam.transform.position.z); //相机位置对应图片中心
         Vector2 minimapLeftTop = new Vector2(minimapCenter.x - 0.5f * minimapWidth, minimapCenter.y + 0.5f * minimapHeiht);
         Vector2 minimapLeftBottom = new Vector2(minimapCenter.x - 0.5f * minimapWidth, minimapCenter.y - 0.5f * minimapHeiht);
