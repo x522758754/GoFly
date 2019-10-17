@@ -152,12 +152,36 @@ Prefab:
     - target: {fileID: 20370928703650482, guid: e5761b779a0543f4e8100ab9b32e298a,
         type: 2}
       propertyPath: orthographic size
-      value: 5
+      value: 13.4
       objectReference: {fileID: 0}
     - target: {fileID: 20370928703650482, guid: e5761b779a0543f4e8100ab9b32e298a,
         type: 2}
       propertyPath: m_ClearFlags
-      value: 3
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1209235264742450, guid: e5761b779a0543f4e8100ab9b32e298a, type: 2}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 20370928703650482, guid: e5761b779a0543f4e8100ab9b32e298a,
+        type: 2}
+      propertyPath: m_BackGroundColor.r
+      value: 0.15105967
+      objectReference: {fileID: 0}
+    - target: {fileID: 20370928703650482, guid: e5761b779a0543f4e8100ab9b32e298a,
+        type: 2}
+      propertyPath: m_BackGroundColor.g
+      value: 0.4554678
+      objectReference: {fileID: 0}
+    - target: {fileID: 20370928703650482, guid: e5761b779a0543f4e8100ab9b32e298a,
+        type: 2}
+      propertyPath: m_BackGroundColor.b
+      value: 0.9338235
+      objectReference: {fileID: 0}
+    - target: {fileID: 20370928703650482, guid: e5761b779a0543f4e8100ab9b32e298a,
+        type: 2}
+      propertyPath: m_BackGroundColor.a
+      value: 0.934
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: e5761b779a0543f4e8100ab9b32e298a, type: 2}

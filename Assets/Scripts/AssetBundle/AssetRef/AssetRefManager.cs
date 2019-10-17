@@ -20,10 +20,10 @@ public class AssetRefManager
             return null;
 
         int instId = asset.GetInstanceID();
-        return GetOrCreateRef(instId);
+        return GetOrCreateRef(instId, asset.name);
     }
 
-    public AssetRef GetOrCreateRef(int instId)
+    public AssetRef GetOrCreateRef(int instId, string assetName)
     {
         if (m_assetRefs.ContainsKey(instId))
         {
@@ -34,6 +34,9 @@ public class AssetRefManager
         {
             InstId = instId,
             Mgr = this,
+#if UNITY_DEV
+            AssetName = assetName,
+#endif
         };
         m_assetRefs.Add(instId, ar);
 
