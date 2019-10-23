@@ -130,4 +130,18 @@ public class ProjectorSetting : MonoBehaviour
         projCam.RenderWithShader(projShader, "ShadowProj");
         //GL.invertCulling = false;
     }
+
+    void OnEnable()
+    {
+        if (projCam != null)
+        {
+            projCam.SetReplacementShader(projShader, "ShadowProj");
+        }
+    }
+
+    void OnDisable()
+    {
+        if (projCam != null)
+            projCam.ResetReplacementShader();
+    }
 }

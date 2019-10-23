@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace XinCustomEditor
+namespace EditorUtils
 {
 
 
@@ -31,5 +31,41 @@ namespace XinCustomEditor
             EditorUtility.SetDirty(go);
         }
 
+
+        public static bool CanStaticCombine(Transform trans)
+        {
+            //各种动画
+            if (trans.GetComponent<Animation>() != null)
+            {
+                return false;
+            }
+            if (trans.GetComponent<Animator>() != null)
+            {
+                return false;
+            }
+
+            //粒子系统
+            if (trans.GetComponent<ParticleSystem>() != null)
+            {
+                return false;
+            }
+
+            //透明材质
+            Renderer r = trans.GetComponent<Renderer>();
+            if (r != null)
+            {
+                Material[] sharedMaterials = r.sharedMaterials;
+                foreach (var material in sharedMaterials)
+                {
+                    if (material == null) return false;
+                    if (material.renderQueue >= 2750 || material.shader.renderQueue >= 2750)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
     }
 }
