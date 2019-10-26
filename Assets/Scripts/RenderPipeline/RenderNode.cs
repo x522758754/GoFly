@@ -28,10 +28,4 @@ public class RenderNode : MonoBehaviour
     {
         RenderPipeline.Inst.OnPostRender(this);
     }
-
-    //4.在场景渲染完成之后允许屏幕图像后期处理调用。Pro Only
-    public void OnRenderImage()
-    {
-
-    }
 }

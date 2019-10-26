@@ -2,7 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Resolution
+public struct Vector2Int
+{
+    public Vector2Int(int x, int y)
+    {
+        this.x = x;
+        this.y = y;
+    }
+
+    public int x;
+    public int y;
+}
+
+
+public class GameResolution
 {
     //场景相机分辨率
     public static Vector2Int[] resolutionSettings =
