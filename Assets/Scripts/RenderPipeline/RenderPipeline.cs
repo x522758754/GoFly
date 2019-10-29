@@ -125,7 +125,14 @@ public class RenderPipeline
     //4.在场景渲染完成之后允许屏幕图像后期处理调用。Pro Only ，不在这里处理后效了
     public void OnRenderImage()
     {
+        //unity，实现屏幕后处理的两种方法,本方案用的是rt第二种
 
+        //方法一：
+        //Main Camera的Target Texture保持为None。挂一个Blit脚本，在其中的OnRenderImage中调用Graphics.Blit(sourceTexture, destTexture, myMaterial)。
+        //需要注意的是myMaterial中的shader一定要用ZWrite Off、ZTest Always的shader。
+
+        //方法二：
+        //为Main Camera的Target Texture指定一个RT，直接渲染到RT，同时将RT赋给一个quad并用一个正交相机对准它。另外为了实现后处理，quad的material需要选一个适当的后处理shader。
     }
 
     public void AddNode(RenderNode node)
