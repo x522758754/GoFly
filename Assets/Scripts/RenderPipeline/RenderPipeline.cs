@@ -51,6 +51,7 @@ public class RenderPipeline
         //如果是被命名的texture，同样可以用在其他shader中。通常用作处理屏幕部分区域特效，比如扭曲火焰，毛玻璃。,效率不如RT，但使用方便，不用手动控制grab时机。
 
 
+        //动态分辨率，低配机缩减分辨率意味着可以大大减少需要渲染的像素数量
 
         sceneCameraRt = RenderTexture.GetTemporary(
             1136, 640, //此处可以扩展成动态分辨率 根据机型高中低
